@@ -23,35 +23,32 @@
 let greetingText = "Hello World";
 console.log(greetingText);
 function example1() {
-  let isDone = false;
-  let age = 23;
-  let firstName = "John";
-  let nothing = null;
-  let notDefined = undefined;
-  let largeNUmber = 100n;
-  let id = Symbol("id");
-  let id2 = Symbol("id");
+    let isDone = false;
+    let age = 23;
+    let firstName = "John";
+    let nothing = null;
+    let notDefined = undefined;
+    let largeNUmber = 100n;
+    let id = Symbol("id");
+    let id2 = Symbol("id");
 }
-
 function example2() {
-  // Array, Date, RegExp, Map and Set
-  let a = [];
-  let pricesList = [1, 2, 3];
-  let pricesList2 = [1, 2, 3];
-  let todayDate = new Date();
-  let regExp = /ab+c/;
-  let set = new Set([1, 2, 3, 3, 2, 1]);
-  class Queue {
-    constructor() {
-      this.data = [];
+    // Array, Date, RegExp, Map and Set
+    let a = [];
+    let pricesList = [1, 2, 3];
+    let pricesList2 = [1, 2, 3];
+    let todayDate = new Date();
+    let regExp = /ab+c/;
+    let set = new Set([1, 2, 3, 3, 2, 1]);
+    class Queue {
+        data = [];
+        push(item) {
+            this.data.push(item);
+        }
+        pop() {
+            this.data.shift();
+        }
     }
-    push(item) {
-      this.data.push(item);
-    }
-    pop() {
-      this.data.shift();
-    }
-  }
-  const queue = new Queue();
+    const queue = new Queue();
 }
 example2();
