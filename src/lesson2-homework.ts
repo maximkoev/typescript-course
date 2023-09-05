@@ -232,7 +232,6 @@ function excercise9() {
 }
 // TODO: compile and run the code
 excercise9();
-
 // try different target compiler options
 function excercise10() {
   // TODO: declare a Rectangle class, with width and height properties
