@@ -62,14 +62,16 @@ excercise13();
 // run the code before and after adding type casting to see the difference
 function excercise14() {
   function fetchUserAge() {
-    const responseText = '{"name": "John", "age": "18"}';
+    const responseText = '{"name": "John", "age": "16"}';
 
     return JSON.parse(responseText).age;
   }
   const userAge = fetchUserAge();
   // TODO: run the code below and observe the result, explain why it is happening,
   // TODO: add type casting to the function above, to fix the error
-  if (userAge > 16) {
+  if (userAge === 16) {
+    console.log("Time to get your driver license");
+  } else if (userAge > 16) {
     console.log("You are old enough to drive");
   } else {
     console.log("You are not old enough to drive");
