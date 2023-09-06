@@ -14,8 +14,7 @@
     "typescript": "^5.2.2"
   },
   "devDependencies": {
-    "@types/node": "^20.5.9",
-    "jest": "^29.7.0"
+    "@types/node": "^20.5.9"
   },
   "prettier": {
     "trailingComma": "es5",

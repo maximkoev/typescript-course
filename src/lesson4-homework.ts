@@ -6,7 +6,7 @@ function exercise17() {
         age: number;
 
         // TODO: add constructor to initialize the properties
-        constructor(name: string, age: number, readonly studentId: string) {
+        constructor(name: string, age: number, private studentId: string) {
             this.name = name;
             this.age = age;
         }
@@ -24,7 +24,8 @@ function exercise17() {
     ivanStudent.printStudent()
     // TODO: try to change the studentId property
     // TODO: change the studentId property to readonly, make sure that changing the property is not allowed
-    //ivanStudent.studentId = 'new-id'// error TS2540: Cannot assign to 'studentId' because it is a read-only property.
+    //ivanStudent.studentId = 'new-id' throws error src/lesson4-homework.ts:26:17 -
+    // error TS2341: Property 'studentId' is private and only accessible within class 'Student'.
 }
 
 // TODO: compile and run the code
@@ -69,9 +70,9 @@ function exercise18() {
 // TODO: compile and run the code
 exercise18();
 
-// use union types to replace unknown type for compile time type checking
+// use uniton types to replace unknown type for compile time type checking
 function exercise19() {
-    function formatCommandLine(command: string | string[]) {
+    function formatCommandLine(command: unknown) {
         if (typeof command === "string") {
             return command.trim();
         } else if (Array.isArray(command)) {
@@ -82,7 +83,7 @@ function exercise19() {
 
     console.log(formatCommandLine("  git status  ")); // git status
     console.log(formatCommandLine(["git ", " status "])); // git status
-    //console.log(formatCommandLine(false)); // run time error - error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'string | string[]'.
+    console.log(formatCommandLine(false)); // run time error - should be compile time error instead
 }
 
 // TODO: compile and run the code
@@ -91,15 +92,10 @@ exercise19();
 // use literal types for type checking
 function exercise20() {
     // TODO: define rock, paper, scissors literal type and assign it to TMove type
-    const moves = ['rock', 'paper', 'scissors'] as const
-    type TMove = typeof moves[number]
+    type TMove = 'rock' | 'paper' | 'scissors' | 'literal';
 
     // TODO: add type check to the function below
     function rockPaperScissorsWins(me: TMove, other: TMove) {
-        console.log(`me: ${me}, ${moves.includes(me) && moves.includes(other)}`)
-        if (!(moves.includes(me) && moves.includes(other))) {
-            throw new Error(`Only ${moves} values allowed`)
-        }
         if (me === "rock" && other === "paper") {
             return false;
         }
@@ -117,9 +113,7 @@ function exercise20() {
     console.log(rockPaperScissorsWins("scissors", "rock")); // false
     console.log(rockPaperScissorsWins("rock", "scissors")); // true
     // TODO: make sure that the following calls are not allowed
-    // console.log(rockPaperScissorsWins("papapaper", "scissors")); // Argument of type '"papapaper"' is not assignable to parameter of type '"rock" | "paper" | "scissors" | "literal"'.
-    //console.log(rockPaperScissorsWins(<TMove>"papapaper", "scissors")); //Error: Only rock,paper,scissors,literal values allowed
-
+    //console.log(rockPaperSizorsVins("papapaper", "scissors")); // true - no type check
 }
 
 // TODO: compile and run the code
@@ -210,19 +204,26 @@ function exercise21() {
 exercise21();
 
 // rewrite the code using async await
-function exercise22() {
-    const later = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+async function exercise22() {
+    async function printMessagesWithTimeout() {
+        await setTimeout(async () => {
+            console.log("1");
 
-    async function printMessagesWithTimeout(): Promise<void> {
-        await later(1000);
-        console.log(1);
-        await later(1000);
-        console.log(2);
-        await later(1000);
-        console.log(3);
+            await setTimeout(() => {
+                console.log("2");
+            }, 1000);
+
+            await setTimeout(async () => {
+                console.log("3");
+
+                await setTimeout(() => {
+                    console.log("4");
+                }, 1000);
+            }, 1000);
+        }, 1000);
     }
 
-    printMessagesWithTimeout()
+    await printMessagesWithTimeout();
 }
 
 // TODO: compile and run the code
