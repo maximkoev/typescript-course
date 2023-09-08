@@ -70,9 +70,9 @@ function exercise18() {
 // TODO: compile and run the code
 exercise18();
 
-// use uniton types to replace unknown type for compile time type checking
+// use union types to replace unknown type for compile time type checking
 function exercise19() {
-    function formatCommandLine(command: unknown) {
+    function formatCommandLine(command: string | string[]) {
         if (typeof command === "string") {
             return command.trim();
         } else if (Array.isArray(command)) {
@@ -83,7 +83,7 @@ function exercise19() {
 
     console.log(formatCommandLine("  git status  ")); // git status
     console.log(formatCommandLine(["git ", " status "])); // git status
-    console.log(formatCommandLine(false)); // run time error - should be compile time error instead
+    //console.log(formatCommandLine(false)); // run time error - error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'string | string[]'.
 }
 
 // TODO: compile and run the code
@@ -113,7 +113,7 @@ function exercise20() {
     console.log(rockPaperScissorsWins("scissors", "rock")); // false
     console.log(rockPaperScissorsWins("rock", "scissors")); // true
     // TODO: make sure that the following calls are not allowed
-    //console.log(rockPaperSizorsVins("papapaper", "scissors")); // true - no type check
+    //console.log(rockPaperScissorsWins("papapaper", "scissors")); // true - no type check
 }
 
 // TODO: compile and run the code
@@ -204,26 +204,19 @@ function exercise21() {
 exercise21();
 
 // rewrite the code using async await
-async function exercise22() {
-    async function printMessagesWithTimeout() {
-        await setTimeout(async () => {
-            console.log("1");
+function exercise22() {
+    const later = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-            await setTimeout(() => {
-                console.log("2");
-            }, 1000);
-
-            await setTimeout(async () => {
-                console.log("3");
-
-                await setTimeout(() => {
-                    console.log("4");
-                }, 1000);
-            }, 1000);
-        }, 1000);
+    async function printMessagesWithTimeout(): Promise<void> {
+        await later(1000);
+        console.log(1);
+        await later(1000);
+        console.log(2);
+        await later(1000);
+        console.log(3);
     }
 
-    await printMessagesWithTimeout();
+    printMessagesWithTimeout()
 }
 
 // TODO: compile and run the code
