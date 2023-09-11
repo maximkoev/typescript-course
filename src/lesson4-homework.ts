@@ -91,7 +91,7 @@ exercise19();
 // use literal types for type checking
 function exercise20() {
     // TODO: define rock, paper, scissors literal type and assign it to TMove type
-    const moves = ['rock', 'paper', 'scissors', 'literal'] as const
+    const moves = ['rock', 'paper', 'scissors'] as const
     type TMove = typeof moves[number]
 
     // TODO: add type check to the function below
