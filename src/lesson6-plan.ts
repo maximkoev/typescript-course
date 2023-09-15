@@ -1,5 +1,109 @@
 // ********* Lesson 6 *********
 
+// Q/A interface merging use case - express middleware example
+function qaInterfaceMerging() {
+  // express base
+  interface Request {
+    body: any;
+  }
+
+  function handleRequest(req: Request) {
+    console.log(req.body);
+  }
+
+  // express middleware - adds json property to the request
+  // by importing npm package of the middleware
+  interface Request {
+    json: any;
+  }
+
+  function handleRequestV2(req: Request) {
+    console.log(req.body);
+    console.log(req.json);
+  }
+
+  type TFormProps = {
+    name: string;
+    age: number;
+    onSubmit: (values: any) => void;
+  };
+}
+// Definite Assignment Assertions
+function definiteAssignmentAssertions() {
+  // definite assignment assertion is a way to tell the compiler that a variable is assigned
+  // even though the compiler cannot detect it
+
+  let userName: string;
+  function fetchUserName() {
+    userName = "John";
+  }
+  fetchUserName();
+  // compiler can not detect that userName is assigned
+  // because fetchUserName is a function that can be synchronous or asynchronous
+  // console.log(userName); // undefined
+  console.log(userName!); // fix here - use definite assignment assertion
+
+  type TUser = {
+    name: string;
+    email: string;
+    age: number;
+    phone?: string;
+  };
+
+  let userObject!: TUser; // exclamantion mark is telling the compiler that userObject is definitely assigned
+  // this is known as definite assignment assertion
+  function buildUser() {
+    userObject = {
+      name: "John",
+      email: "john@mail.com",
+      age: 30,
+    };
+  }
+  buildUser();
+  console.log(userObject.name); // no error since userObject is declared as not null
+
+  // definitive assignment assertion can be used with class properties
+  class Point {
+    x: number;
+    y: number;
+
+    constructor(x: number, y: number) {
+      this.x = x;
+      this.y = y;
+
+      //   this.move(x, y);
+    }
+
+    move(x: number, y: number) {
+      this.x += x;
+      this.y += y;
+    }
+  }
+
+  class Point2 {
+    x!: number;
+    y!: number;
+
+    constructor(x: number, y: number) {
+      this.move(x, y);
+    }
+
+    move(x: number, y: number) {
+      this.x += x;
+      this.y += y;
+    }
+  }
+
+  class User {
+    name!: string;
+    email!: string;
+    age!: number;
+    phone?: string;
+  }
+  // the above class is an exaple where definitive assignment assertion is obused and should be avoided
+}
+definiteAssignmentAssertions();
+
 // Never type
 function neverType() {
   // never type is used to indicate that a function never returns
@@ -149,78 +253,205 @@ function functionOverloading() {
 }
 functionOverloading();
 
-// Definite Assignment Assertions
-function definiteAssignmentAssertions() {
-  // definite assignment assertion is a way to tell the compiler that a variable is assigned
-  // even though the compiler cannot detect it
+// Call Signatures
+function callSignatures() {
+  type TLogCallback = (message: string, userId?: string) => void;
+  type TAddCallback = (x: number, y: number) => number;
 
-  let userName: string;
-  function fetchUserName() {
-    userName = "John";
+  interface IComponentProps {
+    handleAdd: TAddCallback;
+    // same as above
+    // handleAdd: (x: number, y: number) => number;
   }
-  fetchUserName();
-  // compiler can not detect that userName is assigned
-  // because fetchUserName is a function that can be synchronous or asynchronous
-  // console.log(userName); // undefined
-  console.log(userName!); // fix here - use definite assignment assertion
+
+  const props: IComponentProps = {
+    handleAdd: (x, y) => x + y,
+  };
+
+  type TLogCallbackV2 = {
+    // overloaded function signature
+    (message: string): void;
+    (message: string, userId?: string): void;
+    (message: string, userId?: string, extra?: string): void;
+  };
+  type TAddCallbackV2 = {
+    (x: number, y: number): number;
+    // overloaded function signature
+    (x: number, y: string, z: number): string;
+  };
+  interface ILogCallback {
+    // overloaded function signature
+    (message: string): void;
+    (message: string, userId?: string): void;
+    (message: string, userId?: string, extra?: string): void;
+  }
+  interface IAddCallback {
+    (x: number, y: number): number;
+    // overloaded function signature
+    (x: number, y: string, z: number): string;
+  }
+
+  // constructor signature
 
   type TUser = {
     name: string;
-    email: string;
-    age: number;
-    phone?: string;
   };
 
-  let userObject!: TUser; // exclamantion mark is telling the compiler that userObject is definitely assigned
-  // this is known as definite assignment assertion
-  function buildUser() {
-    userObject = {
-      name: "John",
-      email: "john@mail.com",
-      age: 30,
-    };
+  type TUserConstructor = new (name: string) => TUser;
+
+  type TUserConstructorV2 = {
+    // note: the arrow is replaced by a colon
+    // new (name: string) => TUser;
+    new (name: string): TUser;
+  };
+
+  interface IUserConstructor {
+    new (name: string): TUser;
+    // multiple constructor signatures
+    new (name: string, age: number): TUser;
+    // and no new keyword overloads
+    (name: string): TUser;
+    (name: string, age: number): TUser;
+    // and static members
+    debugName: string;
+    callsCount: number;
   }
-  buildUser();
-  console.log(userObject.name); // no error since userObject is declared as not null
-
-  // definitive assignment assertion can be used with class properties
-  class Point {
-    x: number;
-    y: number;
-
-    constructor(x: number, y: number) {
-      this.x = x;
-      this.y = y;
-
-      //   this.move(x, y);
-    }
-
-    move(x: number, y: number) {
-      this.x += x;
-      this.y += y;
-    }
-  }
-
-  class Point2 {
-    x!: number;
-    y!: number;
-
-    constructor(x: number, y: number) {
-      this.move(x, y);
-    }
-
-    move(x: number, y: number) {
-      this.x += x;
-      this.y += y;
-    }
-  }
-
-  class User {
-    name!: string;
-    email!: string;
-    age!: number;
-    phone?: string;
-  }
-  // the above class is an exaple where definitive assignment assertion is obused and should be avoided
 }
-definiteAssignmentAssertions();
+callSignatures();
+
+// Absstract Classes
+function abstractClasses() {
+  abstract class Logger {
+    // includes abstract index signature
+    abstract log(message: string): void;
+
+    // and some implementation methods
+    info(message: string): void {
+      this.log(`INFO: ${message}`);
+    }
+    warn(message: string): void {
+      this.log(`WARN: ${message}`);
+    }
+  }
+
+  // fails when abstract methods are not implemented
+  // class ConsoleLoggerBad extends Logger {}
+
+  // should inherit from CLogger to implement concrete loggers
+  class ConsoleLogger extends Logger {
+    log(message: string): void {
+      console.log(message);
+    }
+  }
+
+  class FileLogger extends Logger {
+    log(message: string): void {
+      // write to file
+    }
+  }
+
+  class DbLogger extends Logger {
+    log(message: string): void {
+      // write to db
+    }
+  }
+
+  // can not create an instance of an abstract class
+  // const logger = new Logger();
+}
+abstractClasses();
+
+// Index Signatures
+function indexSignatures() {
+  // index signature is used to define a type for a dictionary
+  // example
+  const greetings = {
+    a: "Hello",
+    b: "World",
+  };
+
+  console.log(greetings["a"]); // Hello
+  console.log(greetings["b"]); // World
+
+  type TPerson = {
+    name: string;
+    dateOfBirth: Date;
+  };
+  type TDictionary = {
+    [key: string]: string;
+  };
+
+  type TDictionaryV2 = {
+    [key: number]: number;
+  };
+
+  type TPersonMap = {
+    [key: string]: TPerson;
+  };
+  // map is used to store a collection of objects for a rapid search by a key (O(1) complexity)
+
+  const people: TPersonMap = {
+    joe: {
+      name: "Joe",
+      dateOfBirth: new Date(1980, 1, 1),
+    },
+    ann: {
+      name: "Ann",
+      dateOfBirth: new Date(1985, 1, 1),
+    },
+  };
+  // add another person
+  people["max"] = {
+    name: "Max",
+    dateOfBirth: new Date(1990, 1, 1),
+  };
+  // find a person by key
+  people["joe"].dateOfBirth.toISOString();
+
+  // can mix index signatures with other properties
+  type TDictionaryV3 = {
+    [key: string]: string;
+    hello: string;
+    // length: number;
+    // Error: An index signature parameter type must be 'string'
+  };
+  // then hello is required
+  const dictionary: TDictionaryV3 = {
+    hello: "world",
+  };
+
+  // dictionary with length property - use intersection type instead
+  interface IDictionary {
+    [key: string]: string;
+  }
+  type IDictionaryWithLength = IDictionary & {
+    length?: number;
+  };
+  const x5: IDictionaryWithLength = {
+    test: "test string",
+    // still causes an error when declaring as a single object
+    // length: 10
+  };
+  // but allows to add length property later
+  x5.length = 2;
+  x5["somekey"] = "some value";
+
+  // porblem - no type checking for index signatures - people['mike'] is undefined
+  people["mike"].dateOfBirth.toISOString();
+
+  type TPersonMap2 = {
+    [key: string]: TPerson | undefined;
+  };
+  const people2: TPersonMap2 = {
+    joe: {
+      name: "Joe",
+      dateOfBirth: new Date(1980, 1, 1),
+    },
+  };
+  // people2['joe'].dateOfBirth.toISOString();
+  people2["joe"]?.dateOfBirth.toISOString();
+  people2["mike"]?.dateOfBirth.toISOString();
+  // validates the property names correctly
+  // people2['fox'] = {neme: 'Fox', dateOfBirth: new Date(1990, 1, 1)};
+}
+indexSignatures();
