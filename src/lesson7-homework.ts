@@ -88,62 +88,62 @@ function exercise37() {
 exercise37();
 
 // Use experimental decorators
-// function exercise38() {
-//     // TODO: implement decorator to print call count of the function
-//     function count(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-//         // add params here
-//         let callCount = 0;
-//
-//         // TODO: implement decorator
-//
-//         const originalFunc = descriptor.value
-//         descriptor.value = function (...args: any[]) {
-//             // TODO: before calling the function increment callCount
-//             callCount++
-//             const res = originalFunc.apply(this, args)
-//             // TODO: after calling the function print callCount
-//             console.log(`Function called ${callCount} times`)
-//             return res;
-//         }
-//         return descriptor
-//     }
-//
-//     // TODO: implement decorator to print execution time of the function
-//     function time(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-//         // add params here
-//         const original = descriptor.value
-//         descriptor.value = function (this, ...args: any[]) {
-//             // TODO: before calling the function get current time
-//             const currentTimeBefore = Date.now()
-//             const resp = original.apply(this, args)
-//             // TODO: after calling the function get current time
-//             const currentTimeAfter = Date.now()
-//             // TODO: print the difference between the two times after calling the function
-//             const diff = currentTimeAfter - currentTimeBefore
-//             console.log(`Execute time is: ${diff}ms`)
-//             return resp
-//         }
-//         return descriptor;
-//     }
-//
-//     class Calculation {
-//         // TODO: add both decorators to the following method
-//         @count
-//         @time
-//         static add(a: number, b: number): number {
-//             console.log('Inside func')
-//             return a + b
-//         }
-//     }
-//
-//     // TODO: create instance of Calculation class and call add method
-//     // const cals = new Calculation()
-//     console.log(Calculation.add(1, 2))
-//     console.log(Calculation.add(1, 2))
-//     console.log(Calculation.add(1, 2))
-// }
+function exercise38() {
+    // TODO: implement decorator to print call count of the function
+    function count(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        // add params here
+        let callCount = 0;
 
-///exercise38();
+        // TODO: implement decorator
+
+        const originalFunc = descriptor.value
+        descriptor.value = function (...args: any[]) {
+            // TODO: before calling the function increment callCount
+            callCount++
+            const res = originalFunc.apply(this, args)
+            // TODO: after calling the function print callCount
+            console.log(`Function called ${callCount} times`)
+            return res;
+        }
+        return descriptor
+    }
+
+    // TODO: implement decorator to print execution time of the function
+    function time(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        // add params here
+        const original = descriptor.value
+        descriptor.value = function (this, ...args: any[]) {
+            // TODO: before calling the function get current time
+            const currentTimeBefore = Date.now()
+            const resp = original.apply(this, args)
+            // TODO: after calling the function get current time
+            const currentTimeAfter = Date.now()
+            // TODO: print the difference between the two times after calling the function
+            const diff = currentTimeAfter - currentTimeBefore
+            console.log(`Execute time is: ${diff}ms`)
+            return resp
+        }
+        return descriptor;
+    }
+
+    class Calculation {
+        // TODO: add both decorators to the following method
+        @count
+        @time
+        static add(a: number, b: number): number {
+            console.log('Inside func')
+            return a + b
+        }
+    }
+
+    // TODO: create instance of Calculation class and call add method
+    // const cals = new Calculation()
+    console.log(Calculation.add(1, 2))
+    console.log(Calculation.add(1, 2))
+    console.log(Calculation.add(1, 2))
+}
+
+/exercise38();
 
 // Use 2023 decorators (Stage 3 decorator)
 function exercise39() {
