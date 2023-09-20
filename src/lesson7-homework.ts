@@ -42,12 +42,12 @@ function exercise36() {
         // TODO: remove the following line
         //return "";
         // TODO: uncomment the following line
-        return `${this.name}, ${this.age}, ${this.role}`;
+        return `exercise36. ${this.name}, ${this.age}, ${this.role}`;
     }
 
     data.toString = toString;
 
-    console.log(data.toString.call(data));
+    console.log(data.toString());
     console.log(data + "");
 }
 
