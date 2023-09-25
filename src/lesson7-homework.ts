@@ -128,8 +128,8 @@ function exercise38() {
 
     class Calculation {
         // TODO: add both decorators to the following method
-        @count
-        @time
+
+
         static add(a: number, b: number): number {
             console.log('Inside func')
             return a + b
@@ -143,7 +143,7 @@ function exercise38() {
     console.log(Calculation.add(1, 2))
 }
 
-/exercise38();
+//exercise38();
 
 // Use 2023 decorators (Stage 3 decorator)
 function exercise39() {
