@@ -373,15 +373,15 @@ function lesson6() {
             callsCount: number;
         };
 
-        class User implements TUserConstructorV2 {
-            static debugName = "";
-            static callsCount = 0;
-            callsCount: number;
-            debugName: string;
-
-            constructor(public name: string) {
-            }
-        };
+        // class User implements TUserConstructorV2 {
+        //     static debugName = "";
+        //     static callsCount = 0;
+        //     callsCount: number;
+        //     debugName: string;
+        //
+        //     constructor(public name: string) {
+        //     }
+        // };
     }
 
     callSignatures();
