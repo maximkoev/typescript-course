@@ -13,7 +13,7 @@ function exerciseExtra1() {
         for (let i = 0; i < s1Arr.length; i++) {
             const currentChar = s1Arr[i];
             const charIndex = s2Arr.indexOf(currentChar)
-            s2Arr.splice(i, 1)
+            s2Arr.splice(charIndex, 1)
             if (charIndex < 0) {
                 isAnagram = false
                 break;
