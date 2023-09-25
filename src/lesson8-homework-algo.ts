@@ -9,20 +9,17 @@ function exerciseExtra1() {
         if (s1Arr.length != s2Arr.length) {
             isAnagram = false
             return isAnagram;
-            // return isAnagram;
         }
         for (let i = 0; i < s1Arr.length; i++) {
             const currentChar = s1Arr[i];
             const charIndex = s2Arr.indexOf(currentChar)
+            s2Arr.splice(i, 1)
             if (charIndex < 0) {
                 isAnagram = false
                 break;
             }
-            // s2Arr.splice(charIndex, 1)
         }
-        // if (s2Arr.length == 0) {
-        //     isAnagram = true
-        // }
+
         return isAnagram;
     }
 
@@ -31,6 +28,9 @@ function exerciseExtra1() {
     console.assert(areAnagrams("abc", "cba"), "abc&cba are not anagram");
     console.assert(!areAnagrams("abc", "cbd"), "abc&cbd are anagram");
     console.assert(areAnagrams("", ""), "empty strings");
+    console.assert(!areAnagrams("abcсс", "abcaa"), "abcc and abcaa are not anagrams")
+    console.assert(!areAnagrams("abca", "abcc"), "abcc and abcaa are not anagrams")
+    console.assert(!areAnagrams("abcaa", "abccc"), "abcc and abcaa are not anagrams")
 
 
     // HINT: consider exercise33 for code reuse ideas
