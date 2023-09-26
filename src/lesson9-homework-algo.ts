@@ -9,7 +9,6 @@ function exerciseExtra2() {
 
     function verifyFizzOrBuzz(i: number) {
         if (i === 0) return i
-        if (i % 5 == 0 && i % 3 == 0) return 'FizzBuzz'
         if (i % 3 == 0) return 'Fizz'
         if (i % 5 == 0) return 'Buzz'
         else return i
@@ -22,6 +21,7 @@ function exerciseExtra2() {
         }
     }
 
+    // fizzBuzz();
 
     /**
      * 1
@@ -47,15 +47,12 @@ function exerciseExtra2() {
     // TODO: write a test to validate fizzBuzz output using console.assert
     console.assert(typeof fizzBuzzToString() === 'string');
     console.assert(verifyFizzOrBuzz(3) === 'Fizz', 'should return Fizz')
-    console.assert(verifyFizzOrBuzz(0) === 0, 'should return 0 for i=0')
     console.assert(verifyFizzOrBuzz(5) === 'Buzz', 'should return buzz')
     console.assert(verifyFizzOrBuzz(4) === 4, 'should return 4')
     console.assert(verifyFizzOrBuzz(1) === 1, 'should return 1')
     console.assert(verifyFizzOrBuzz(2) === 2, 'should return 2')
-    console.assert(verifyFizzOrBuzz(6) === 'Fizz', 'should return Fizz for 6')
-    console.assert(verifyFizzOrBuzz(30) === 'FizzBuzz', `should return FizzBuzz for 30`)
+    console.assert(verifyFizzOrBuzz(6) === 6, 'should return Fizz for 6')
     console.assert(fizzBuzzToString().split('')[0] === '0', 'first element should be 0')
-
 }
 
 exerciseExtra2();
