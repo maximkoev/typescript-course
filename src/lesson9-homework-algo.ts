@@ -47,6 +47,7 @@ function exerciseExtra2() {
     // TODO: write a test to validate fizzBuzz output using console.assert
     console.assert(typeof fizzBuzzToString() === 'string');
     console.assert(verifyFizzOrBuzz(3) === 'Fizz', 'should return Fizz')
+    console.assert(verifyFizzOrBuzz(0) === 0, 'should return 0 for i=0')
     console.assert(verifyFizzOrBuzz(5) === 'Buzz', 'should return buzz')
     console.assert(verifyFizzOrBuzz(4) === 4, 'should return 4')
     console.assert(verifyFizzOrBuzz(1) === 1, 'should return 1')
