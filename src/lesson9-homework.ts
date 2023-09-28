@@ -60,11 +60,14 @@ function exercise49() {
         return `${size}-${color}`;
     }
 
-    // function createTshirt2<T extends TTshirtsSizeNColor>(size: TTshirtsSize, color: TTshirtsColor): T {
-    //     return `${size}-${color}`;
-    // }
+    function createTshirt2(size: TTshirtsSize, color: TTshirtsColor): TTshirtsSizeNColor {
+        return `${size}-${color}`;
+    }
 
     const tshirts: TTshirtsSizeNColor = createTshirt("S", "red");
+    const tshirts2: TTshirtsSizeNColor = createTshirt2("S", "green");
+    console.log(tshirts)
+    console.log(tshirts2)
 }
 
 exercise49();
