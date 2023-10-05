@@ -58,10 +58,10 @@
 - Rendering array of items, keys
 - Conditional Rendering
 - Handling Events
-- Managing State
 - Passing Data via Props - props Interface
 - Passing Functions via Props
-- Passing Children
+- Managing State
+- >Passing Children
 - Inspecting Components with React Dev - Tools
 
 --
@@ -73,16 +73,17 @@
 - CSS in JS, Styled Components
 - Popular UI Libraries
   
+
 --
 
 ## React hooks
 - useState
 - useEffect
 - useRef
-- useContext
-- useReducer
 - useCallback
 - useMemo
+- useContext
+- useReducer
 - useImperativeHandle
 - useLayoutEffect
 - useDebugValue
