@@ -3,7 +3,8 @@
 --
 
 ## Building first components
-- >Passing Children
+- Managing State - useState hook - batched updates, function updater
+- Passing Children
 - Inspecting Components with React Dev - Tools
 
 --
@@ -13,7 +14,7 @@
 - CSS Stylesheets
 - CSS Modules
 - CSS in JS, Styled Components
-- Popular UI Libraries  
+- Popular UI Libraries - Material UI, Ant Design, etc.
 
 --
 
@@ -27,6 +28,16 @@
 --
 
 ## React Router
+  - Setup
+  - Adding router
+    - createBrowserRouter
+    - RouterProvider
+  - Root route
+  - Not Found error
+  - Params and query params
+  - Nested routes
+  - Client side navigation (Link)
+
 
 --
 
