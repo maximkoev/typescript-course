@@ -1,4 +1,4 @@
-# React framework quick start
+# React framework part 1
 
 --
 
@@ -61,31 +61,3 @@
 - Passing Data via Props - props Interface
 - Passing Functions via Props
 - Managing State
-- >Passing Children
-- Inspecting Components with React Dev - Tools
-
---
-
-## React styling
-- Inline Styles
-- CSS Stylesheets
-- CSS Modules
-- CSS in JS, Styled Components
-- Popular UI Libraries
-  
-
---
-
-## React hooks
-- useState
-- useEffect
-- useRef
-- useCallback
-- useMemo
-- useContext
-- useReducer
-- useImperativeHandle
-- useLayoutEffect
-- useDebugValue
-- Custom Hooks
-
