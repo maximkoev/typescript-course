@@ -1,15 +1,19 @@
-type TUser = {
-  name: string;
-  age?: number;
+type TUser1 = {
+    name: string;
+    age?: number;
 };
 
 interface IUserConstructor {
-  new (name: string): TUser;
-  new (name: string, age: number): TUser;
-  (name: string): TUser;
-  (name: string, age: number): TUser;
-  debugName: string;
-  callsCount: number;
+    debugName: string;
+    callsCount: number;
+
+    new(name: string): TUser1;
+
+    new(name: string, age: number): TUser1;
+
+    (name: string): TUser1;
+
+    (name: string, age: number): TUser1;
 }
 
 // TODO: implement the instance side of the type IUserConstructor
