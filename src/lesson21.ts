@@ -1,7 +1,8 @@
 function lesson21() {
   // ********* Lesson 21 *********
+  // Structural Patterns
+  // - Adapter
   // Javascript most difficult parts
-  // event loop
   // promises
 }
 lesson10();

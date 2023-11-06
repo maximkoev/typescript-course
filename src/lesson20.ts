@@ -14,6 +14,7 @@ function lesson20() {
       LEVEL_TWO,
       LEVEL_THREE,
       LEVEL_FOUR,
+      LEVEL_FIVE,
       INVALID_REQUEST,
     }
 
@@ -146,6 +147,29 @@ function lesson20() {
       }
     }
 
+    class CEOSupport implements ISupportService {
+      private next!: ISupportService;
+
+      public getNext(): ISupportService {
+        return this.next;
+      }
+
+      setNext(next: ISupportService) {
+        this.next = next;
+        return this;
+      }
+
+      handleRequest(request: ServiceRequest) {
+        if (request.getType() == ServiceLevel.LEVEL_FIVE) {
+          request.setConclusion("SEO solved level three request !!");
+        } else if (this.next != null) {
+          this.next.handleRequest(request);
+        } else {
+          throw new Error("No handler found for :: " + request.getType());
+        }
+      }
+    }
+
     // How to use?
     class ChainOfResponsibilityTest {
       static test() {
@@ -154,13 +178,19 @@ function lesson20() {
         const supervisorSupport: SupervisorSupport = new SupervisorSupport();
         const managerSupport: ManagerSupport = new ManagerSupport();
         const directorSupport: DirectorSupport = new DirectorSupport();
+        const ceoSupport: CEOSupport = new CEOSupport();
 
         const supportService: SupportService = new SupportService();
-        supportService.setHandler(
-          frontendDeskSupport.setNext(
-            supervisorSupport.setNext(managerSupport.setNext(directorSupport))
-          )
-        );
+        // supportService.setHandler(
+        //   frontendDeskSupport.setNext(
+        //     supervisorSupport.setNext(managerSupport.setNext(directorSupport))
+        //   )
+        // );
+        supportService.setHandler(frontendDeskSupport);
+        frontendDeskSupport.setNext(supervisorSupport);
+        supervisorSupport.setNext(managerSupport);
+        managerSupport.setNext(directorSupport);
+        directorSupport.setNext(ceoSupport);
 
         let request: ServiceRequest = new ServiceRequest();
         request.setType(ServiceLevel.LEVEL_ONE);
@@ -178,11 +208,60 @@ function lesson20() {
         console.log(request.getConclusion());
       }
     }
+
+    ChainOfResponsibilityTest.test();
   }
   chainOfResponsibilityDemo();
 
   // - Observer
   function observerDemo() {
+    const fileLogger = {
+      log: (message: string) => {
+        // write file
+      },
+    };
+    const emailSender = {
+      send: (message: string, email: string) => {
+        // send email
+      },
+    };
+    const smsSender = {
+      send: (message: string) => {
+        // send sms
+      },
+    };
+    const ADMIN_EMAIL = "admin@app.com";
+    const appWatcher = {
+      // sendAppIsDownRedAlert: () => {
+      //   // write file
+      //   fileLogger.log("App is down");
+      //   // send email to admin
+      //   emailSender.send("App is down", ADMIN_EMAIL);
+      //   // send sms
+      //   smsSender.send("App is down");
+      // },
+      sbscribers: [] as any[],
+      subscribeToEvent(event: string, callback: (message: string) => void) {
+        this.sbscribers.push({ event, callback });
+      },
+
+      triggerEvent(event: string) {
+        for (const subscriber of this.sbscribers) {
+          if (subscriber.event === event) {
+            subscriber.callback("App is down");
+          }
+        }
+      },
+    };
+
+    appWatcher.subscribeToEvent("appIsDown", fileLogger.log);
+    appWatcher.subscribeToEvent("appIsDown", fileLogger.log);
+    appWatcher.subscribeToEvent("appIsDown", fileLogger.log);
+    appWatcher.subscribeToEvent("appIsDown", fileLogger.log);
+    appWatcher.subscribeToEvent("appIsDown", fileLogger.log);
+
+    // appWatcher.sendAppIsDownRedAlert();
+    appWatcher.triggerEvent("appIsDown");
     /**
      * Need: Log any modification of the device volume that the user do.
      *
@@ -260,6 +339,8 @@ function lesson20() {
      */
     const volumeController = new VolumeControllerSubject();
     const loggingObserver = new LoggingObserver(volumeController);
+
+    volumeController.on("volumeUp", () => {});
 
     volumeController.volumeUp();
     volumeController.volumeDown();
@@ -458,8 +539,8 @@ function lesson20() {
     abstract class House {
       buildhouse() {
         this.constructBase();
-        this.constructRoof();
         this.constructWalls();
+        this.constructRoof();
         this.constructWindows();
         this.constructDoors();
         this.paintHouse();
@@ -1151,4 +1232,4 @@ function lesson20() {
   }
   mementoDemo();
 }
-lesson10();
+lesson20();
