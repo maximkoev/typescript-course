@@ -3,7 +3,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 
 function lesson20() {
-  // ********* Lesson 18 *********
+  // ********* Lesson 20 *********
   // Behavioral Design Patterns
   // - Observer
   function observerDemo() {
@@ -283,16 +283,9 @@ function lesson20() {
     }
 
     /**
-     * Working implementation of the strategy to upload a file to a local directory.
+     * Strategy to upload a file to a local directory.
      */
     class LocalUpload implements UploadStrategy {
-      /**
-       * Uploads a file to a local directory.
-       * @param filePath The path to the directory to upload to.
-       * @param name The name of the file to upload.
-       * @param content The content of the file to upload.
-       * @returns A promise that resolves to the result of the upload.
-       */
       public upload(
         filePath: string,
         name: string,
@@ -352,7 +345,7 @@ function lesson20() {
       }
 
       /**
-       * EN: The Context delegates some work to the Strategy object instead of
+       * The Context delegates some work to the Strategy object instead of
        * implementing multiple versions of the algorithm on its own.
        *
        */
@@ -382,26 +375,19 @@ function lesson20() {
   function commandDemo() {}
   commandDemo();
   // - Chain of Responsibility
-  function chainOfResponsibility() {
-    // example 1
-    // Unethical behavior by an employee, who is to blame?
-    // - The employee
-    // - The manager
-    // - The CEO
-    // Clicking on a button in a GUI, finding the correct handler
-    // - The button
-    // - The form
-    // - The window
-    // - The application
-    // Error handling in a program, finding the right handler
-    // - The code that caused the error
-    // - The component that called the code that caused the error
-    // - The page that the component is on
-    // - The whole application
-  }
+  function chainOfResponsibilityDemo() {}
+  chainOfResponsibilityDemo();
   // - Visitor
+  function visitorDemo() {}
+  visitorDemo();
   // - State
+  function stateDemo() {}
+  stateDemo();
   // - Memento
+  function mementoDemo() {}
+  mementoDemo();
   // - Template Method
+  function templateMethodDemo() {}
+  templateMethodDemo();
 }
 lesson10();
