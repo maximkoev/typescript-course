@@ -1,10 +1,186 @@
-import { EventEmitter } from "node:events";
+import { EventEmitter } from "events";
 import * as fs from "fs/promises";
 import * as path from "path";
 
 function lesson20() {
   // ********* Lesson 20 *********
   // Behavioral Design Patterns
+  // - Chain of Responsibility
+  function chainOfResponsibilityDemo() {
+    // Support desk > supervisor > manager > director
+
+    enum ServiceLevel {
+      LEVEL_ONE,
+      LEVEL_TWO,
+      LEVEL_THREE,
+      LEVEL_FOUR,
+      INVALID_REQUEST,
+    }
+
+    class ServiceRequest {
+      private type!: ServiceLevel;
+      private conclusion: string | null = null;
+
+      getType(): ServiceLevel {
+        return this.type;
+      }
+
+      setType(type: ServiceLevel) {
+        this.type = type;
+      }
+
+      getConclusion(): string | null {
+        return this.conclusion;
+      }
+
+      setConclusion(conclusion: string) {
+        this.conclusion = conclusion;
+      }
+    }
+
+    interface ISupportService {
+      handleRequest(request: ServiceRequest): void;
+    }
+
+    class SupportService implements ISupportService {
+      private handler!: ISupportService;
+
+      getHandler(): ISupportService {
+        return this.handler;
+      }
+
+      setHandler(handler: ISupportService) {
+        this.handler = handler;
+      }
+
+      handleRequest(request: ServiceRequest) {
+        this.handler.handleRequest(request);
+      }
+    }
+
+    class FrontDeskSupport implements ISupportService {
+      private next!: ISupportService;
+
+      getNext(): ISupportService {
+        return this.next;
+      }
+
+      setNext(next: ISupportService) {
+        this.next = next;
+        return this;
+      }
+
+      handleRequest(service: ServiceRequest) {
+        if (service.getType() == ServiceLevel.LEVEL_ONE)
+          service.setConclusion("Front desk solved level one request !!");
+        else if (this.next != null) this.next.handleRequest(service);
+        else throw new Error("No handler found for :: " + service.getType());
+      }
+    }
+
+    class SupervisorSupport implements ISupportService {
+      private next!: ISupportService;
+
+      getNext(): ISupportService {
+        return this.next;
+      }
+
+      setNext(next: ISupportService) {
+        this.next = next;
+        return this;
+      }
+
+      handleRequest(request: ServiceRequest) {
+        if (request.getType() == ServiceLevel.LEVEL_TWO)
+          request.setConclusion("Supervisor solved level two request !!");
+        else if (this.next != null) this.next.handleRequest(request);
+        else throw new Error("No handler found for :: " + request.getType());
+      }
+    }
+
+    class ManagerSupport implements ISupportService {
+      private next!: ISupportService;
+
+      public getNext(): ISupportService {
+        return this.next;
+      }
+
+      setNext(next: ISupportService) {
+        this.next = next;
+        return this;
+      }
+
+      handleRequest(request: ServiceRequest) {
+        if (request.getType() == ServiceLevel.LEVEL_THREE) {
+          request.setConclusion("Manager solved level three request !!");
+        } else if (this.next != null) {
+          this.next.handleRequest(request);
+        } else {
+          throw new Error("No handler found for :: " + request.getType());
+        }
+      }
+    }
+
+    class DirectorSupport implements ISupportService {
+      private next!: ISupportService;
+
+      getNext(): ISupportService {
+        return this.next;
+      }
+
+      setNext(next: ISupportService) {
+        this.next = next;
+      }
+
+      handleRequest(request: ServiceRequest) {
+        debugger;
+        if (request.getType() == ServiceLevel.LEVEL_FOUR)
+          request.setConclusion("Director solved level four request !!");
+        else if (this.next != null) this.next.handleRequest(request);
+        else {
+          request.setConclusion("You problem is none of our business");
+          throw new Error(
+            "You problem is none of our business :: " + request.getType()
+          );
+        }
+      }
+    }
+
+    // How to use?
+    class ChainOfResponsibilityTest {
+      static test() {
+        //// Support desk > supervisor > manager > director
+        const frontendDeskSupport: FrontDeskSupport = new FrontDeskSupport();
+        const supervisorSupport: SupervisorSupport = new SupervisorSupport();
+        const managerSupport: ManagerSupport = new ManagerSupport();
+        const directorSupport: DirectorSupport = new DirectorSupport();
+
+        const supportService: SupportService = new SupportService();
+        supportService.setHandler(
+          frontendDeskSupport.setNext(
+            supervisorSupport.setNext(managerSupport.setNext(directorSupport))
+          )
+        );
+
+        let request: ServiceRequest = new ServiceRequest();
+        request.setType(ServiceLevel.LEVEL_ONE);
+        supportService.handleRequest(request);
+        console.log(request.getConclusion());
+
+        request = new ServiceRequest();
+        request.setType(ServiceLevel.LEVEL_THREE);
+        supportService.handleRequest(request);
+        console.log(request.getConclusion());
+
+        request = new ServiceRequest();
+        request.setType(ServiceLevel.INVALID_REQUEST);
+        supportService.handleRequest(request);
+        console.log(request.getConclusion());
+      }
+    }
+  }
+  chainOfResponsibilityDemo();
+
   // - Observer
   function observerDemo() {
     /**
@@ -59,11 +235,11 @@ function lesson20() {
         this.volumeController.on("volumeDown", this.volumeDownObserver);
       }
 
-      private volumeUpObserver(volume) {
+      private volumeUpObserver(volume: number) {
         console.log(`Volume up, now the volume value is ${volume}`);
       }
 
-      private volumeDownObserver(volume) {
+      private volumeDownObserver(volume: number) {
         console.log(`Volume down, now the volume value is ${volume}`);
       }
 
@@ -102,14 +278,23 @@ function lesson20() {
     volumeController.volumeDown();
   }
   observerDemo();
+
   // - Mediator
   function mediatorDemo() {
     /**
-     * Need: To have a messaging application to notify groups of people. Users
+     * Need: To have a messaging application to notify groups of users. Users
      * should not know about each other.
      *
      * Solution: Create a mediator to manage subscriptions and messages
      */
+
+    // The observer pattern: Class A, can have zero or more observers of type O registered with it.
+    // When something in A is changed it notifies all of the observers.
+
+    // The mediator pattern: You have some number of instances of class X (or maybe even several different types:X, Y & Z),
+    // and they wish to communicate with each other (but you don't want each to have explicit references to each other),
+    // so you create a mediator class M. Each instance of X has a reference to a shared instance of M, through which it
+    // can communicate with the other instances of X (or X, Y and Z).
 
     /**
      * Extending the Mediator interface to have a payload to include messages
@@ -154,7 +339,7 @@ function lesson20() {
           console.log(`Publishing message "${payload}" to the group`);
           const usersExcludingSender = this.users.filter((u) => u !== sender);
           for (const user of usersExcludingSender) {
-            user.receiveMessage(payload);
+            user.receiveMessage(payload || "");
           }
         }
       }
@@ -174,6 +359,7 @@ function lesson20() {
     user3.publishMessage("Tomato");
   }
   mediatorDemo();
+
   // - Iterator
   function iteratorDemo() {
     /**
@@ -218,7 +404,6 @@ function lesson20() {
         return { value, done };
       }
 
-      // tslint:disable-next-line
       [Symbol.iterator]() {
         return this;
       }
@@ -267,6 +452,102 @@ function lesson20() {
     }
   }
   iteratorDemo();
+
+  // - Template Method
+  function templateMethodDemo() {
+    abstract class House {
+      buildhouse() {
+        this.constructBase();
+        this.constructRoof();
+        this.constructWalls();
+        this.constructWindows();
+        this.constructDoors();
+        this.paintHouse();
+        this.decorateHouse();
+      }
+
+      abstract decorateHouse(): void;
+      abstract paintHouse(): void;
+      abstract constructDoors(): void;
+      abstract constructWindows(): void;
+      abstract constructWalls(): void;
+
+      constructRoof() {
+        console.log("Roof has been constructed.");
+      }
+
+      constructBase() {
+        console.log("Base has been constructed.");
+      }
+    }
+
+    class ConcreteWallHouse extends House {
+      decorateHouse() {
+        console.log("Decorating Concrete Wall House");
+      }
+
+      paintHouse() {
+        console.log("Painting Concrete Wall House");
+      }
+
+      constructDoors() {
+        console.log("Constructing Doors for Concrete Wall House");
+      }
+
+      constructWindows() {
+        console.log("Constructing Windows for Concrete Wall House");
+      }
+
+      constructWalls() {
+        console.log("Constructing Concrete Wall for my House");
+      }
+    }
+
+    class GlassWallHouse extends House {
+      decorateHouse() {
+        console.log("Decorating Glass Wall House");
+      }
+
+      paintHouse() {
+        console.log("Painting Glass Wall House");
+      }
+
+      constructDoors() {
+        console.log("Constructing Doors for Glass Wall House");
+      }
+
+      constructWindows() {
+        console.log("Constructing Windows for Glass Wall House");
+      }
+
+      constructWalls() {
+        console.log("Constructing Glass Wall for my House");
+      }
+    }
+
+    // how to use
+    class TemplateMethodTest {
+      static test() {
+        console.log("Going to build Concrete Wall House");
+
+        let house: House = new ConcreteWallHouse();
+        house.buildhouse();
+
+        console.log("Concrete Wall House constructed successfully");
+
+        console.log("********************");
+
+        console.log("Going to build Glass Wall House");
+
+        house = new GlassWallHouse();
+        house.buildhouse();
+
+        console.log("Glass Wall House constructed successfully");
+      }
+    }
+  }
+  templateMethodDemo();
+
   // - Strategy
   function strategyDemo() {
     interface UploadResult {
@@ -275,17 +556,24 @@ function lesson20() {
     }
 
     interface UploadStrategy {
+      checkPermissions(): Promise<boolean>;
       upload(
         filePath: string,
         name: string,
         content: string
       ): Promise<UploadResult>;
+      checkSuccess(): Promise<boolean>;
     }
 
     /**
      * Strategy to upload a file to a local directory.
      */
     class LocalUpload implements UploadStrategy {
+      public checkPermissions(): Promise<boolean> {
+        return new Promise((resolve) => {
+          resolve(true);
+        });
+      }
       public upload(
         filePath: string,
         name: string,
@@ -308,6 +596,11 @@ function lesson20() {
             });
         });
       }
+      public checkSuccess(): Promise<boolean> {
+        return new Promise((resolve) => {
+          resolve(true);
+        });
+      }
     }
 
     /**
@@ -315,6 +608,11 @@ function lesson20() {
      * It is not a real strategy, but it is enough for the example.
      */
     class AWSUpload implements UploadStrategy {
+      public checkPermissions(): Promise<boolean> {
+        return new Promise((resolve) => {
+          resolve(true);
+        });
+      }
       public upload(
         filePath: string,
         name: string,
@@ -331,9 +629,14 @@ function lesson20() {
           }, 1000);
         });
       }
+      public checkSuccess(): Promise<boolean> {
+        return new Promise((resolve) => {
+          resolve(true);
+        });
+      }
     }
 
-    class Context {
+    class UploaderService {
       private strategy: UploadStrategy;
 
       constructor(strategy: UploadStrategy) {
@@ -345,16 +648,28 @@ function lesson20() {
       }
 
       /**
-       * The Context delegates some work to the Strategy object instead of
+       * The UploaderService delegates some work to the Strategy object instead of
        * implementing multiple versions of the algorithm on its own.
        *
        */
-      public fileUpload(
+      public async uploadFile(
         filePath: string,
         name: string,
         content: string
       ): Promise<UploadResult> {
-        return this.strategy.upload(filePath, name, content);
+        const permission = await this.strategy.checkPermissions();
+        if (!permission) {
+          throw new Error("You don't have permissions to upload");
+        }
+
+        const result = await this.strategy.upload(filePath, name, content);
+
+        const success = await this.strategy.checkSuccess();
+        if (!success) {
+          throw new Error("Upload failed");
+        }
+
+        return result;
       }
     }
 
@@ -364,30 +679,476 @@ function lesson20() {
     const localUpload = new LocalUpload();
     const awsUpload = new AWSUpload();
 
-    const context = new Context(localUpload);
+    const uploaderService = new UploaderService(localUpload);
 
-    context.fileUpload("/", "Output.txt", "Hello World").then((result) => {
-      console.log(result);
-    });
+    uploaderService
+      .uploadFile("/", "Output.txt", "Hello World")
+      .then((result) => {
+        console.log(result);
+      });
+    // ususaly the client is in another file, so all changes are made in the client
   }
   strategyDemo();
+
   // - Command
-  function commandDemo() {}
+  function commandDemo() {
+    class Television {
+      adjustVolumeUp() {
+        console.log("TV -> adjustVolumeUp");
+      }
+
+      adjustVolumeDown() {
+        console.log("TV -> adjustVolumeDown");
+      }
+
+      powerOff() {
+        console.log("TV -> powerOff");
+      }
+    }
+
+    interface Command {
+      execute(): void;
+    }
+
+    class VolumeUpCommand implements Command {
+      private tv: Television;
+
+      constructor(tv: Television) {
+        this.tv = tv;
+      }
+
+      public execute(): void {
+        this.tv.adjustVolumeUp();
+      }
+    }
+
+    class RemoteControlButton {
+      private command!: Command;
+
+      public setCommand(command: Command): void {
+        this.command = command;
+      }
+
+      public buttonClicked(): void {
+        this.command.execute();
+      }
+    }
+
+    class VolumeDownCommand implements Command {
+      private tv: Television;
+
+      constructor(tv: Television) {
+        this.tv = tv;
+      }
+
+      public execute(): void {
+        this.tv.adjustVolumeDown();
+      }
+    }
+
+    class PowerOffCommand implements Command {
+      private tv: Television;
+
+      constructor(tv: Television) {
+        this.tv = tv;
+      }
+
+      public execute(): void {
+        this.tv.powerOff();
+      }
+    }
+
+    class RemoteControl {
+      public volumeUpButton: RemoteControlButton;
+      public volumeDownButton: RemoteControlButton;
+      public powerOffButton: RemoteControlButton;
+
+      constructor(tv: Television) {
+        this.volumeUpButton = new RemoteControlButton();
+        this.volumeDownButton = new RemoteControlButton();
+        this.powerOffButton = new RemoteControlButton();
+
+        this.volumeUpButton.setCommand(new VolumeUpCommand(tv));
+        this.volumeDownButton.setCommand(new VolumeDownCommand(tv));
+        this.powerOffButton.setCommand(new PowerOffCommand(tv));
+
+        this.powerOffButton.buttonClicked();
+      }
+    }
+
+    new RemoteControl(new Television());
+  }
   commandDemo();
-  // - Chain of Responsibility
-  function chainOfResponsibilityDemo() {}
-  chainOfResponsibilityDemo();
+
   // - Visitor
-  function visitorDemo() {}
+  function visitorDemo() {
+    interface Router {
+      // Visitable
+      sendData(data: string): void;
+
+      acceptData(data: string): void;
+
+      accept(v: RouterVisitor): void;
+    }
+
+    class DLinkRouter implements Router {
+      sendData(data: string) {
+        console.log(`DLinkRouter: sendData ${data}`);
+      }
+
+      acceptData(data: string) {
+        console.log(`DLinkRouter: acceptData ${data}`);
+      }
+
+      accept(v: RouterVisitor) {
+        v.visit(this);
+      }
+    }
+
+    class LinkSysRouter implements Router {
+      sendData(data: string) {
+        console.log(`LinkSysRouter: sendData ${data}`);
+      }
+
+      acceptData(data: string) {
+        console.log(`LinkSysRouter: acceptData ${data}`);
+      }
+
+      accept(v: RouterVisitor) {
+        v.visit(this);
+      }
+    }
+
+    class TPLinkRouter implements Router {
+      sendData(data: string) {
+        console.log(`TPLinkRouter: sendData ${data}`);
+      }
+
+      acceptData(data: string) {
+        console.log(`TPLinkRouter: acceptData ${data}`);
+      }
+
+      accept(v: RouterVisitor) {
+        v.visit(this);
+      }
+    }
+
+    interface RouterVisitor {
+      visit(router: Router): void;
+    }
+
+    class LinuxConfigurator implements RouterVisitor {
+      visit(router: Router) {
+        if (router instanceof TPLinkRouter) {
+          this.visitTPLinkRouter(router);
+        } else if (router instanceof DLinkRouter) {
+          this.visitDLinkRouter(router);
+        } else if (router instanceof LinkSysRouter) {
+          this.visitLinkSysRouter(router);
+        }
+      }
+
+      private visitDLinkRouter(router: DLinkRouter) {
+        console.log("DLinkRouter Configuration for Linux complete !!");
+      }
+
+      private visitTPLinkRouter(router: TPLinkRouter) {
+        console.log("TPLinkRouter Configuration for Linux complete !!");
+      }
+
+      private visitLinkSysRouter(router: LinkSysRouter) {
+        console.log("LinkSysRouter Configuration for Linux complete !!");
+      }
+    }
+
+    class WindowsConfigurator implements RouterVisitor {
+      visit(router: Router) {
+        if (router instanceof TPLinkRouter) {
+          this.visitTPLinkRouter(router);
+        } else if (router instanceof DLinkRouter) {
+          this.visitDLinkRouter(router);
+        } else if (router instanceof LinkSysRouter) {
+          this.visitLinkSysRouter(router);
+        }
+      }
+
+      private visitDLinkRouter(router: DLinkRouter) {
+        console.log("DLinkRouter Configuration for Windows complete !!");
+      }
+
+      private visitTPLinkRouter(router: TPLinkRouter) {
+        console.log("TPLinkRouter Configuration for Windows complete !!");
+      }
+
+      private visitLinkSysRouter(router: LinkSysRouter) {
+        console.log("LinkSysRouter Configuration for Windows complete !!");
+      }
+    }
+
+    // How to use?
+    class VisitorTest {
+      static test() {
+        let windowsConfigurator: WindowsConfigurator;
+        let linuxConfigurator: LinuxConfigurator;
+        let dlink: DLinkRouter;
+        let tplink: TPLinkRouter;
+        let linksys: LinkSysRouter;
+
+        function setUp() {
+          windowsConfigurator = new WindowsConfigurator();
+          linuxConfigurator = new LinuxConfigurator();
+
+          dlink = new DLinkRouter();
+          tplink = new TPLinkRouter();
+          linksys = new LinkSysRouter();
+        }
+
+        function testDlink() {
+          dlink.accept(windowsConfigurator);
+          dlink.accept(linuxConfigurator);
+        }
+
+        function testTPLink() {
+          tplink.accept(windowsConfigurator);
+          tplink.accept(linuxConfigurator);
+        }
+
+        function testLinkSys() {
+          linksys.accept(windowsConfigurator);
+          linksys.accept(linuxConfigurator);
+        }
+
+        setUp();
+
+        testDlink();
+
+        testLinkSys();
+
+        testTPLink();
+      }
+    }
+  }
   visitorDemo();
+
   // - State
-  function stateDemo() {}
+  function stateDemo() {
+    interface PackageState {
+      updateState(context: DeliveryContext): void;
+    }
+
+    class Acknowledged implements PackageState {
+      //Singleton
+      private static instance: Acknowledged = new Acknowledged();
+
+      private constructor() {}
+
+      public static getInstance(): Acknowledged {
+        return Acknowledged.instance;
+      }
+
+      //Business logic and state transition
+      updateState(context: DeliveryContext) {
+        console.log("Package is acknowledged !!");
+        context.setCurrentState(Shipped.getInstance());
+      }
+    }
+
+    class Shipped implements PackageState {
+      //Singleton
+      private static instance: Shipped = new Shipped();
+
+      constructor() {}
+
+      public static getInstance(): Shipped {
+        return Shipped.instance;
+      }
+
+      //Business logic and state transition
+      updateState(context: DeliveryContext) {
+        console.log("Package is shipped !!");
+        context.setCurrentState(InTransition.getInstance());
+      }
+    }
+
+    class InTransition implements PackageState {
+      //Singleton
+      private static instance: InTransition = new InTransition();
+
+      private constructor() {}
+
+      public static getInstance(): InTransition {
+        return InTransition.instance;
+      }
+
+      //Business logic and state transition
+      updateState(context: DeliveryContext) {
+        console.log("Package is in transition !!");
+        context.setCurrentState(OutForDelivery.getInstance());
+      }
+    }
+
+    class OutForDelivery implements PackageState {
+      //Singleton
+      private static instance: OutForDelivery = new OutForDelivery();
+
+      private constructor() {}
+
+      public static getInstance(): OutForDelivery {
+        return OutForDelivery.instance;
+      }
+
+      //Business logic and state transition
+      updateState(context: DeliveryContext) {
+        console.log("Package is out of delivery !!");
+        context.setCurrentState(Delivered.getInstance());
+      }
+    }
+
+    class Delivered implements PackageState {
+      //Singleton
+      private static instance: Delivered = new Delivered();
+
+      private constructor() {}
+
+      public static getInstance() {
+        return Delivered.instance;
+      }
+
+      //Business logic
+      updateState(context: DeliveryContext) {
+        console.log("Package is delivered!!");
+      }
+    }
+
+    class DeliveryContext {
+      constructor(
+        private packageId: string,
+        private currentState?: PackageState
+      ) {
+        if (!currentState) {
+          this.currentState = Acknowledged.getInstance();
+        }
+      }
+
+      getCurrentState(): PackageState | undefined {
+        return this.currentState;
+      }
+
+      setCurrentState(currentState: PackageState) {
+        this.currentState = currentState;
+      }
+
+      getPackageId(): string {
+        return this.packageId;
+      }
+
+      setPackageId(packageId: string) {
+        this.packageId = packageId;
+      }
+
+      update() {
+        if (this.currentState) this.currentState.updateState(this);
+      }
+    }
+
+    // How to use?
+
+    class StateTest {
+      static test() {
+        const ctx: DeliveryContext = new DeliveryContext("Test123");
+
+        ctx.update();
+        ctx.update();
+        ctx.update();
+        ctx.update();
+        ctx.update();
+      }
+    }
+  }
   stateDemo();
+
   // - Memento
-  function mementoDemo() {}
+  function mementoDemo() {
+    class Article {
+      constructor(
+        private id: number,
+        private title: string,
+        private content?: string
+      ) {}
+
+      setId(value: number) {
+        this.id = value;
+      }
+
+      setTitle(value: string) {
+        this.title = value;
+      }
+
+      setContent(value: string) {
+        this.content = value;
+      }
+
+      createMemento(): ArticleMemento {
+        return new ArticleMemento(this.id, this.title, this.content);
+      }
+
+      restore(m: ArticleMemento) {
+        this.id = m.getId();
+        this.title = m.getTitle();
+        this.content = m.getContent();
+      }
+
+      toString(): string {
+        return (
+          "Article [id=" +
+          this.id +
+          ", title=" +
+          this.title +
+          ", content=" +
+          this.content +
+          "]"
+        );
+      }
+    }
+
+    class ArticleMemento {
+      constructor(
+        private id: number,
+        private title: string,
+        private content?: string
+      ) {}
+
+      getId(): number {
+        return this.id;
+      }
+
+      getTitle(): string {
+        return this.title;
+      }
+
+      getContent(): string {
+        return this.content || "";
+      }
+    }
+
+    // How to use?
+    class MementoTest {
+      static test() {
+        const article: Article = new Article(1, "My Article");
+        article.setContent("ABC");
+        console.log(article);
+
+        const memento: ArticleMemento = article.createMemento();
+        article.setContent("123");
+        console.log("Content updated to 123");
+        console.log(article);
+
+        article.restore(memento);
+        console.log("Content restored");
+        console.log(article);
+      }
+    }
+  }
   mementoDemo();
-  // - Template Method
-  function templateMethodDemo() {}
-  templateMethodDemo();
 }
 lesson10();
