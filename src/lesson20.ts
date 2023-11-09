@@ -773,91 +773,243 @@ function lesson20() {
 
   // - Command
   function commandDemo() {
-    class Television {
-      adjustVolumeUp() {
-        console.log("TV -> adjustVolumeUp");
-      }
+    function example1() {
+      function before() {
+        class Light {
+          private _isOn: boolean = false;
 
-      adjustVolumeDown() {
-        console.log("TV -> adjustVolumeDown");
-      }
+          turnOn() {
+            console.log("Light -> turnOn");
+            this._isOn = true;
+          }
 
-      powerOff() {
-        console.log("TV -> powerOff");
+          turnOff() {
+            console.log("Light -> turnOff");
+            this._isOn = false;
+          }
+
+          isOn(): boolean {
+            return this._isOn;
+          }
+        }
+        class Room {
+          private _light: Light;
+
+          constructor() {
+            this._light = new Light();
+          }
+
+          turnLightOnOff() {
+            if (this._light.isOn()) {
+              console.log("Room -> turnLightOnOff");
+              this._light.turnOn();
+            } else {
+              console.log("Room -> turnOffLight");
+              this._light.turnOff();
+            }
+          }
+        }
+
+        class KitchenRoom extends Room {
+          // private _oven: Oven;
+        }
+
+        class BathroomRoom extends Room {
+          // private _shower: Shower;
+        }
+
+        class LivingRoom extends Room {
+          // private _tv: Television;
+        }
+
+        class Bedroom extends Room {
+          // private _musicPlayer: MusicPlayer;
+        }
+
+        class House {
+          public rooms: Room[] = [];
+
+          public addRoom(room: Room) {
+            this.rooms.push(room);
+          }
+        }
+
+        const house = new House();
+        house.addRoom(new KitchenRoom());
+        house.addRoom(new BathroomRoom());
+        house.addRoom(new LivingRoom());
+        house.addRoom(new Bedroom());
+        house.rooms.forEach((room) => room.turnLightOnOff());
+
+        // problems - if we want to add a new light we have to change all the code
       }
+      before();
+
+      function after() {
+        class Light {
+          _isOn: boolean = false;
+
+          toggle() {
+            console.log("Light -> toggle");
+            this._isOn = !this._isOn;
+          }
+        }
+
+        // extract the call to the light to a command
+
+        interface ICommand {
+          execute(): void;
+        }
+        class LightCommand implements ICommand {
+          private _light: Light;
+
+          constructor(light: Light) {
+            this._light = light;
+          }
+
+          execute() {
+            this._light.toggle();
+          }
+        }
+
+        class Room {
+          private _lightCommand: ICommand;
+
+          constructor(lightCommand: ICommand) {
+            this._lightCommand = lightCommand;
+          }
+
+          turnLightOnOff() {
+            this._lightCommand.execute();
+          }
+        }
+
+        class KitchenRoom extends Room {
+          // private _ovenCommand: ICommand;
+        }
+
+        class BathroomRoom extends Room {
+          // private _showerCommand: ICommand;
+        }
+
+        class LivingRoom extends Room {
+          // private _tvCommand: ICommand;
+        }
+
+        class Bedroom extends Room {
+          // private _musicPlayerCommand: ICommand;
+        }
+
+        class House {
+          public rooms: Room[] = [];
+
+          public addRoom(room: Room) {
+            this.rooms.push(room);
+          }
+        }
+
+        const house = new House();
+        const kitchenRoom = new KitchenRoom(new LightCommand(new Light()));
+        house.addRoom(kitchenRoom);
+        const bathroomRoom = new BathroomRoom(new LightCommand(new Light()));
+        house.addRoom(bathroomRoom);
+        const livingRoom = new LivingRoom(new LightCommand(new Light()));
+        house.addRoom(livingRoom);
+
+        house.rooms.forEach((room) => room.turnLightOnOff());
+      }
+      after();
     }
+    example1();
 
-    interface Command {
-      execute(): void;
+    function example2() {
+      class Television {
+        adjustVolumeUp() {
+          console.log("TV -> adjustVolumeUp");
+        }
+
+        adjustVolumeDown() {
+          console.log("TV -> adjustVolumeDown");
+        }
+
+        powerOff() {
+          console.log("TV -> powerOff");
+        }
+      }
+
+      interface Command {
+        execute(): void;
+      }
+
+      class VolumeUpCommand implements Command {
+        private tv: Television;
+
+        constructor(tv: Television) {
+          this.tv = tv;
+        }
+
+        public execute(): void {
+          this.tv.adjustVolumeUp();
+        }
+      }
+
+      class RemoteControlButton {
+        private command!: Command;
+
+        public setCommand(command: Command): void {
+          this.command = command;
+        }
+
+        public buttonClicked(): void {
+          this.command.execute();
+        }
+      }
+
+      class VolumeDownCommand implements Command {
+        private tv: Television;
+
+        constructor(tv: Television) {
+          this.tv = tv;
+        }
+
+        public execute(): void {
+          this.tv.adjustVolumeDown();
+        }
+      }
+
+      class PowerOffCommand implements Command {
+        private tv: Television;
+
+        constructor(tv: Television) {
+          this.tv = tv;
+        }
+
+        public execute(): void {
+          this.tv.powerOff();
+        }
+      }
+
+      class RemoteControl {
+        public volumeUpButton: RemoteControlButton;
+        public volumeDownButton: RemoteControlButton;
+        public powerOffButton: RemoteControlButton;
+
+        constructor(tv: Television) {
+          this.volumeUpButton = new RemoteControlButton();
+          this.volumeDownButton = new RemoteControlButton();
+          this.powerOffButton = new RemoteControlButton();
+
+          this.volumeUpButton.setCommand(new VolumeUpCommand(tv));
+          this.volumeDownButton.setCommand(new VolumeDownCommand(tv));
+          this.powerOffButton.setCommand(new PowerOffCommand(tv));
+
+          this.powerOffButton.buttonClicked();
+        }
+      }
+
+      new RemoteControl(new Television());
     }
-
-    class VolumeUpCommand implements Command {
-      private tv: Television;
-
-      constructor(tv: Television) {
-        this.tv = tv;
-      }
-
-      public execute(): void {
-        this.tv.adjustVolumeUp();
-      }
-    }
-
-    class RemoteControlButton {
-      private command!: Command;
-
-      public setCommand(command: Command): void {
-        this.command = command;
-      }
-
-      public buttonClicked(): void {
-        this.command.execute();
-      }
-    }
-
-    class VolumeDownCommand implements Command {
-      private tv: Television;
-
-      constructor(tv: Television) {
-        this.tv = tv;
-      }
-
-      public execute(): void {
-        this.tv.adjustVolumeDown();
-      }
-    }
-
-    class PowerOffCommand implements Command {
-      private tv: Television;
-
-      constructor(tv: Television) {
-        this.tv = tv;
-      }
-
-      public execute(): void {
-        this.tv.powerOff();
-      }
-    }
-
-    class RemoteControl {
-      public volumeUpButton: RemoteControlButton;
-      public volumeDownButton: RemoteControlButton;
-      public powerOffButton: RemoteControlButton;
-
-      constructor(tv: Television) {
-        this.volumeUpButton = new RemoteControlButton();
-        this.volumeDownButton = new RemoteControlButton();
-        this.powerOffButton = new RemoteControlButton();
-
-        this.volumeUpButton.setCommand(new VolumeUpCommand(tv));
-        this.volumeDownButton.setCommand(new VolumeDownCommand(tv));
-        this.powerOffButton.setCommand(new PowerOffCommand(tv));
-
-        this.powerOffButton.buttonClicked();
-      }
-    }
-
-    new RemoteControl(new Television());
+    example2();
   }
   commandDemo();
 

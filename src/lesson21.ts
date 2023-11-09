@@ -3,73 +3,266 @@ function lesson21() {
   // Structural Patterns
   // - Adapter
   function adapterDemo() {
-    /**
-     * Need: Interact with a Taxi price calculator that works with miles and £
-     * with a client that provide Kms and expect a price in €.
-     *
-     * Solution: Create an adapter that translates the input and output values
-     * into the expected formats.
-     */
-
-    /**
-     * In this case, the target is an interface that the application is
-     * compatible with
-     */
-    interface TaxiCalculator {
-      calculatePriceInEuros(km: number, isAirport: boolean): number;
-    }
-
-    /**
-     * The Adaptee is an existing library that contains the logic that we want
-     * to reuse.
-     */
-    class UKTaxiCalculatorLibrary {
-      public getPriceInPounds(miles: number, fare: Fares): number {
-        if (fare === Fares.Airport) {
-          return 5 + miles * 2.15;
+    // adapter pattern - allows objects with incompatible interfaces to collaborate
+    // - it wraps an object, exposes a different interface and delegates to the wrapped object
+    function example1() {
+      interface IMsLogin {
+        login(email: string, password: string): void;
+        getLoginHeaders(): string[];
+        checkIsLoggedIn(): boolean;
+        logout(): void;
+      }
+      class MicrosoftLogin implements IMsLogin {
+        public login(email: string, password: string) {
+          console.log("Microsoft login");
         }
-        return miles * 1.95;
+        public getLoginHeaders() {
+          console.log("Microsoft getLoginHeaders");
+          return [];
+        }
+        public checkIsLoggedIn() {
+          console.log("Microsoft checkIsLoggedIn");
+          return true;
+        }
+        public logout() {
+          console.log("Microsoft logout");
+        }
       }
-    }
 
-    enum Fares {
-      Standard,
-      Airport,
-    }
-
-    /**
-     * The Taxi Calculator Adapter makes the Adaptee's interface compatible
-     * with the one that the client expects.
-     */
-    class UKTaxiCalculatorLibraryAdapter implements TaxiCalculator {
-      constructor(private adaptee: UKTaxiCalculatorLibrary) {}
-
-      calculatePriceInEuros(km: number, isAirport: boolean): number {
-        const miles = km * 1.609;
-        const fare = isAirport ? Fares.Airport : Fares.Standard;
-        const pounds = this.adaptee.getPriceInPounds(miles, fare);
-        const euros = pounds * 1.15;
-        return euros;
+      interface IGoogleLogin {
+        userLogin(data: { email: string; password: string }): void;
+        userLogout(): void;
+        getLoginStatus(): "connected" | "disconnected";
+        getAuthTokens(): string[];
       }
-    }
 
-    /**
-     * The client code works with objects that implements the TaxiCalculator
-     * interface, so we can use the adapter to reuse the incompatible library
-     */
-    function client(taxiCalculator: TaxiCalculator): void {
-      console.log("Calculating the price for a 15 Km run to the airport");
-      const priceInEuros = taxiCalculator.calculatePriceInEuros(15, true);
-      console.log(`Total price: ${priceInEuros}€`);
-    }
+      class GoogleLogin implements IGoogleLogin {
+        public userLogin(data: { email: string; password: string }) {
+          console.log("Google login");
+        }
+        public userLogout() {
+          console.log("Google logout");
+        }
+        public getLoginStatus() {
+          console.log("Google getLoginStatus");
+          return "connected" as const;
+        }
+        public getAuthTokens() {
+          console.log("Google getAuthTokens");
+          return [];
+        }
+      }
 
-    const incompatibleLibrary = new UKTaxiCalculatorLibrary();
-    const adaptedLibrary = new UKTaxiCalculatorLibraryAdapter(
-      incompatibleLibrary
-    );
-    client(adaptedLibrary);
+      function noAdapterExample1(type: "google" | "microsoft" = "google") {
+        if (type === "google") {
+          const googleLogin = new GoogleLogin();
+          googleLogin.userLogin({ email: "email", password: "password" });
+          googleLogin.getLoginStatus();
+          googleLogin.getAuthTokens();
+          googleLogin.userLogout();
+        } else if (type === "microsoft") {
+          const microsoftLogin = new MicrosoftLogin();
+          microsoftLogin.login("email", "password");
+          microsoftLogin.getLoginHeaders();
+          microsoftLogin.checkIsLoggedIn();
+          microsoftLogin.logout();
+        }
+      }
+      noAdapterExample1();
+
+      class GoogleLoginAdapter implements IMsLogin {
+        private googleLogin: IGoogleLogin;
+        constructor(googleLogin: IGoogleLogin) {
+          this.googleLogin = googleLogin;
+        }
+        public login(email: string, password: string) {
+          this.googleLogin.userLogin({ email, password });
+        }
+        public getLoginHeaders() {
+          return this.googleLogin.getAuthTokens();
+        }
+        public checkIsLoggedIn() {
+          return this.googleLogin.getLoginStatus() === "connected";
+        }
+        public logout() {
+          this.googleLogin.userLogout();
+        }
+      }
+
+      const microsoftLogin = new MicrosoftLogin();
+      microsoftLogin.login("email", "password");
+      microsoftLogin.getLoginHeaders();
+      microsoftLogin.checkIsLoggedIn();
+      microsoftLogin.logout();
+
+      const googleLogin = new GoogleLogin();
+      const adaptedMsLogin: IMsLogin = new GoogleLoginAdapter(googleLogin);
+      adaptedMsLogin.login("email", "password");
+      adaptedMsLogin.getLoginHeaders();
+      adaptedMsLogin.checkIsLoggedIn();
+      adaptedMsLogin.logout();
+    }
+    example1();
+
+    function example2() {
+      /**
+       * Need: Interact with a Taxi price calculator that works with miles and £
+       * with a client that provide Kms and expect a price in €.
+       *
+       * Solution: Create an adapter that translates the input and output values
+       * into the expected formats.
+       */
+      /**
+       * In this case, the target is an interface that the application is
+       * compatible with
+       */
+      interface TaxiCalculator {
+        calculatePriceInEuros(km: number, isAirport: boolean): number;
+      }
+      /**
+       * The Adaptee is an existing library that contains the logic that we want
+       * to reuse.
+       */
+      class UKTaxiCalculatorLibrary {
+        public getPriceInPounds(miles: number, fare: Fares): number {
+          if (fare === Fares.Airport) {
+            return 5 + miles * 2.15;
+          }
+          return miles * 1.95;
+        }
+      }
+      enum Fares {
+        Standard,
+        Airport,
+      }
+      /**
+       * The Taxi Calculator Adapter makes the Adaptee's interface compatible
+       * with the one that the client expects.
+       */
+      class UKTaxiCalculatorLibraryAdapter implements TaxiCalculator {
+        constructor(private adaptee: UKTaxiCalculatorLibrary) {}
+        calculatePriceInEuros(km: number, isAirport: boolean): number {
+          const miles = km * 1.609;
+          const fare = isAirport ? Fares.Airport : Fares.Standard;
+          const pounds = this.adaptee.getPriceInPounds(miles, fare);
+          const euros = pounds * 1.15;
+          return euros;
+        }
+      }
+      /**
+       * The client code works with objects that implements the TaxiCalculator
+       * interface, so we can use the adapter to reuse the incompatible library
+       */
+      function client(taxiCalculator: TaxiCalculator): void {
+        console.log("Calculating the price for a 15 Km run to the airport");
+        const priceInEuros = taxiCalculator.calculatePriceInEuros(15, true);
+        console.log(`Total price: ${priceInEuros}€`);
+      }
+      const incompatibleLibrary = new UKTaxiCalculatorLibrary();
+      const adaptedLibrary = new UKTaxiCalculatorLibraryAdapter(
+        incompatibleLibrary
+      );
+      client(adaptedLibrary);
+    }
+    example2();
   }
   adapterDemo();
+
+  // - Decorator
+  function decoratorDemo() {
+    function before() {
+      // notifier class
+      class Notifier {
+        public send(message: string) {
+          console.log(`Sending message: ${message}`);
+        }
+      }
+
+      class WatsAppNotifier extends Notifier {
+        public send(message: string) {
+          console.log(`Sending WhatsApp message: ${message}`);
+        }
+      }
+
+      class FacebookNotifier extends Notifier {
+        public send(message: string) {
+          console.log(`Sending Facebook message: ${message}`);
+        }
+      }
+
+      class EmailNotifier extends Notifier {
+        public send(message: string) {
+          console.log(`Sending Email message: ${message}`);
+        }
+      }
+
+      class EmailAndFacebookNotifier extends Notifier {
+        public send(message: string) {
+          console.log(`Sending Email message: ${message}`);
+          console.log(`Sending Facebook message: ${message}`);
+        }
+      }
+
+      class EmailAndWhatsAppNotifier extends Notifier {
+        public send(message: string) {
+          console.log(`Sending Email message: ${message}`);
+          console.log(`Sending WhatsApp message: ${message}`);
+        }
+      }
+    }
+    before();
+
+    // solution - decorator pattern - allows attach new behaviors to objects by placing
+    // these objects inside special wrapper objects that contain the behaviors.
+
+    // wrapper class has the same interface as the wrapped class
+    // and contains a reference to an instance of the wrapped class
+
+    interface INotifier {
+      send(message: string): void;
+    }
+    class Notifier implements INotifier {
+      constructor(private notifier: INotifier | null) {}
+
+      public send(message: string) {
+        this.notifier?.send(message);
+      }
+    }
+
+    class WatsAppNotifier extends Notifier {
+      public send(message: string) {
+        super.send(message);
+        console.log(`Sending WhatsApp message: ${message}`);
+      }
+    }
+
+    class FacebookNotifier extends Notifier {
+      public send(message: string) {
+        super.send(message);
+        console.log(`Sending Facebook message: ${message}`);
+      }
+    }
+
+    class EmailNotifier extends Notifier {
+      public send(message: string) {
+        super.send(message);
+        console.log(`Sending Email message: ${message}`);
+      }
+    }
+
+    const emailNotifier = new EmailNotifier(null);
+    emailNotifier.send("hello world");
+
+    const wn = new WatsAppNotifier(null);
+    const emailAndWhatsAppNotifier = new EmailNotifier(wn);
+    emailAndWhatsAppNotifier.send("hello world");
+
+    const allNotifier = new FacebookNotifier(
+      new EmailNotifier(new WatsAppNotifier(null))
+    );
+    allNotifier.send("hello world");
+  }
+  decoratorDemo();
 
   // - Proxy
   async function proxyDemo() {
@@ -248,10 +441,6 @@ function lesson21() {
     // Expected output: 2
   }
   proxyInCoreJs();
-
-  // - Decorator
-  function decoratorDemo() {}
-  decoratorDemo();
 
   // - Bridge
   function bridgeDemo() {}
