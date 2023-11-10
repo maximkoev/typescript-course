@@ -261,6 +261,57 @@ function lesson21() {
       new EmailNotifier(new WatsAppNotifier(null))
     );
     allNotifier.send("hello world");
+
+    const crazyNotifier = new EmailNotifier(
+      new EmailNotifier(new EmailNotifier(null))
+    );
+    crazyNotifier.send("hello world");
+
+    const notifiersClasses = {
+      email: EmailNotifier,
+      whatsapp: WatsAppNotifier,
+      facebook: FacebookNotifier,
+    };
+    type NotifierName = keyof typeof notifiersClasses;
+    const notifiers: NotifierName[] = ["email", "whatsapp"];
+    const notifier = notifiers.reduce(
+      (acc: INotifier, notifierName: NotifierName): INotifier => {
+        if (notifierName in notifiersClasses) {
+          const ClassRef =
+            notifiersClasses[notifierName as keyof typeof notifiersClasses];
+          const n: INotifier = new ClassRef(acc);
+          // acc -> new Notifier(null)
+          // ClassRef -> EmailNotifier
+          // return new EmailNotifier(new Notifier(null));
+
+          // acc -> EmailNotifier(new Notifier(null))
+          // ClassRef -> WatsAppNotifier
+          // return new WatsAppNotifier(new EmailNotifier(new Notifier(null)));
+
+          return n;
+        }
+
+        return acc;
+      },
+      new Notifier(null)
+    );
+
+    notifier.send("hello world");
+
+    //
+    const notifyByFb = true;
+    const notifyByWa = true;
+    const notifyByEmail = false;
+    let notifier1: INotifier = new Notifier(null);
+    if (notifyByFb) {
+      notifier1 = new FacebookNotifier(notifier1);
+    }
+    if (notifyByWa) {
+      notifier1 = new WatsAppNotifier(notifier1);
+    }
+    if (notifyByEmail) {
+      notifier1 = new EmailNotifier(notifier1);
+    }
   }
   decoratorDemo();
 
@@ -290,7 +341,7 @@ function lesson21() {
      */
     class RealWeatherServiceSDK implements WeatherService {
       public async request(): Promise<WeatherForecast> {
-        const randomWeatherForecast = {
+        const randomWeatherForecast: WeatherForecast = {
           avgTemperature: Math.random() * 35,
           maxPrecipitationProbability: Math.random() * 100,
         };
